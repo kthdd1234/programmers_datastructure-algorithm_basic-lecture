@@ -21,14 +21,15 @@ def recursive(n):
         return recursive(n - 1) + recursive(n - 2)
 
 
-def iteraive(n):
+def iteraive(n):  # 3
     if n <= 1:
         return n
     else:
         i = 2
         t0 = 0
         t1 = 1
-        while i <= 2:
+        while i <= n:
+            # f1 (1, 1) / f2 (1, 2) / f3 (2, 3) / f4 (3, 5) / f5 (5, 8) / f6 (8, 13)
             t0, t1 = t1, t0 + t1
             i += 1
         return t1
