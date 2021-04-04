@@ -1,18 +1,6 @@
-# 연결 리스트(Linked Lists)
-# 데이터 원소들을 순서를 지어 늘어놓는다는 점에서 연결 리스트(linked list) 는 선형 배열(linear array) 과 비슷한 면이 있음
-# 데이터 원소들을 늘어놓는 방식에서 두 가지의 큰 차이가 있음
-# 선형 배열(linear array): 번호가 붙여진 칸에 원소들을 채워놓는 방식
-# 연결 리스트(Linked list): 각 원소들을 줄줄이 엮어서 관리하는 방식
+# 연결 리스트의 맨 앞에다가 데이터 원소를 담고 있지 않은, 그냥 자리만 차지하는 노드를 추가한, 조금 모습이 달라진 연결 리스트를 정의
+# 이렇게 맨 앞에 추가된, 데이터 원소를 담고 있지 않은 노드를 더미 노드(dummy node)라고 함
 
-# 배열과 비교한 연결 리스트
-
-# 배열 저장 공간: 연속한 위치
-# 연결 리스트 저장 공간: 임의의 위치
-
-# 배열 특정 원소 지칭: 매우 간편 / O(1)
-# 연결 리스트 특정 원소 지칭: 선형탐색과 유사 / O(n)
-
-# 연결 리스트 자료 구조 정의
 class Node:
     def __init__(self, item):
         self.data = item
@@ -22,8 +10,9 @@ class Node:
 class LinkedList:
     def __init__(self):
         self.nodeCount = 0
-        self.head = None
+        self.head = Node(None)
         self.tail = None
+        self.head.next = self.tail
 
     def __repr__(self):
         if self.nodeCount == 0:
@@ -38,11 +27,11 @@ class LinkedList:
             curr = curr.next
         return s
 
-    # 특정 원소 참조(pos 번째)
+    # 특정 원소 참조(pos 번째 노드 얻어내기)
     def getAt(self, pos):
-        if pos <= 0 or pos > self.nodeCount:
+        if pos < 0 or pos > self.nodeCount:
             return None
-        i = 1
+        i = 0
         curr = self.head
         while i < pos:
             curr = curr.next
@@ -73,6 +62,36 @@ class LinkedList:
         self.nodeCount += 1
         return True
 
+    def popAt(self, pos):
+        result = None
+        try:
+            if pos < 1 or pos > self.nodeCount:
+                raise IndexError
+
+            if pos == 1:
+                if self.nodeCount == 1:
+                    node = self.head or self.tail
+                    self.head = None
+                    self.tail = None
+                    result = node.data
+                else:
+                    node = self.head
+                    self.head = node.next
+                    result = node.data
+            else:
+                prev = self.getAt(pos - 1)
+                node = prev.next
+                result = node.data
+                if pos == self.nodeCount:
+                    self.tail = prev
+                    prev.next = None
+                else:
+                    prev.next = node.next
+            self.nodeCount -= 1
+            return result
+        except IndexError:
+            return False
+
     # 길이 얻어내기
     def getLength(self):
         return self.nodeCount
@@ -81,9 +100,9 @@ class LinkedList:
     def traverse(self):
         result = []
         curr = self.head
-        while curr is not None:
-            result.append(curr.data)
+        while curr.next:
             curr = curr.next
+            result.append(curr.data)
         return result
 
     # 두 리스트 합치기
@@ -92,17 +111,3 @@ class LinkedList:
         if L.tail:
             self.tail = L.tail
         self.nodeCount += L.nodeCount
-
-
-# 연결 리스트에 나열된 데이터 원소들의 사이에 새로운 데이터 원소를 삽입하려면, 앞/뒤의 원소들을 연결하고 있는 링크를 끊어 내고, 그 자리에 새로운 원소를 집어넣기 위해서 링크들을 조정해줘야 합니다.
-
-# 연결 리스트 - 원소의 삽입(명세 정의)
-# pos 가 가리키는 위치에 (1 <= pos <= nodeCount + 1)
-# newNode 를 삽입하고
-# 성공/실패에 따라 True/False 를 리턴
-
-# 맨 앞에 삽입하는 경우: O(1)
-# 중간에 삽입하는 경우: O(n)
-# 맨 끝에 삽입하는 경우: O(1)
-
-# 연결 리스트 연산 - 원소의 삭제
