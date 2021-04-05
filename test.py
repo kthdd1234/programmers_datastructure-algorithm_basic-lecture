@@ -26,9 +26,10 @@ class LinkedList:
 
     # 특정 원소 참조(pos 번째)
     def getAt(self, pos):
-        if pos <= 0 or pos > self.nodeCount:
+        if pos < 0 or pos > self.nodeCount:
             return None
-        i = 1
+
+        i = 0
         curr = self.head
         while i < pos:
             curr = curr.next
@@ -37,55 +38,38 @@ class LinkedList:
         return curr
 
     # 원소 삽입
+    def insertAfter(self, prev, newNode):
+        newNode.next = prev.next
+        if prev.next is None:
+            self.tail = newNode
+        prev.next = newNode
+        self.nodeCount += 1
+        return True
+
     def insertAt(self, pos, newNode):
         if pos < 1 or pos > self.nodeCount + 1:
             return False
 
-        if pos == 1:
-            newNode.next = self.head
-            self.head = newNode
-
+        if pos != 1 and pos == self.nodeCount + 1:
+            prev = self.tail
         else:
-            if pos == self.nodeCount + 1:
-                prev = self.tail
-            else:
-                prev = self.getAt(pos - 1)
-            newNode.next = prev.next
-            prev.next = newNode
+            prev = self.getAt(pos - 1)
+        return self.insertAfter(prev, newNode)
 
-        if pos == self.nodeCount + 1:
-            self.tail = newNode
-
-        self.nodeCount += 1
-        return True
+    def popAfter(self, prev):
+        node = prev.next
+        if node.next is None:
+            self.tail = prev
+        prev.next = node.next
+        self.nodeCount -= 1
+        return node.data
 
     def popAt(self, pos):
-        result = None
         try:
             if pos < 1 or pos > self.nodeCount:
                 raise IndexError
-
-            if pos == 1:
-                if self.nodeCount == 1:
-                    node = self.head or self.tail
-                    self.head = None
-                    self.tail = None
-                    result = node.data
-                else:
-                    node = self.head
-                    self.head = node.next
-                    result = node.data
-            else:
-                prev = self.getAt(pos - 1)
-                node = prev.next
-                result = node.data
-                if pos == self.nodeCount:
-                    self.tail = prev
-                    prev.next = None
-                else:
-                    prev.next = node.next
-            self.nodeCount -= 1
-            return result
+            prev = self.getAt(pos - 1)
+            return self.popAfter(prev)
         except IndexError:
             return False
 
@@ -110,22 +94,25 @@ class LinkedList:
         self.nodeCount += L.nodeCount
 
 
-'''
 A = Node(67)
 B = Node(34)
+'''
 C = Node(28)
 D = Node(12)
 E = Node(90)
 F = Node(50)
+'''
 
 L1 = LinkedList()
 
 L1.insertAt(1, A)
 L1.insertAt(2, B)
+'''
 L1.insertAt(3, C)
-L1.insertAt(1, D)
-L1.insertAt(2, E)
+L1.insertAt(4, D)
+L1.insertAt(5, E)
 L1.insertAt(6, F)
+'''
 
 print('Linked lists:', L1)
 
@@ -133,7 +120,24 @@ result1 = L1.popAt(1)
 print('result1:', result1)
 print('Linked lists:', L1)
 
-result2 = L1.popAt(5)
+
+result2 = L1.popAt(1)
 print('result2:', result2)
+print('Linked lists:', L1)
+'''
+result3 = L1.popAt(4)
+print('result3:', result3)
+print('Linked lists:', L1)
+
+result4 = L1.popAt(3)
+print('result4:', result4)
+print('Linked lists:', L1)
+
+result5 = L1.popAt(2)
+print('result5:', result5)
+print('Linked lists:', L1)
+
+result6 = L1.popAt(1)
+print('result6:', result6)
 print('Linked lists:', L1)
 '''
