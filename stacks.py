@@ -80,6 +80,30 @@ class LinkedListStack:
 
 # 알고리즘의 설계
 
+
+def splitTokens(exprStr):
+    tokens = []
+    val = 0
+    valProcessing = False
+    for c in exprStr:
+        if c == ' ':
+            continue
+        if c in '0123456789':
+            val = val * 10 + int(c)
+            valProcessing = True
+        else:
+            if valProcessing:
+                tokens.append(val)
+                val = 0
+            valProcessing = False
+            tokens.append(c)
+
+    if valProcessing:
+        tokens.append(val)
+
+    return tokens
+
+
 # 연산자의 우선순위 설정
 prec = {
     '*': 3, '/': 3,
@@ -103,39 +127,46 @@ prec = {
 # 스택에 남아 있는 연산자 모두 pop() 하는 순환문: while not opStack.isEmpty(): 사용
 
 
-def solution(S):  # (A+B)*(C+D)
-    opStack = ArrayStack()
-    answer = ''
+# ['(', 123, '+', 51, ')', '*', '(', 22, '+', 2, ')']
+def infixToPostfix(tokenList):
+    prec = {
+        '*': 3, '/': 3,
+        '+': 2, '-': 2,
+        '(': 1
+    }
 
-    for str in S:
-        if str.isalpha():
-            answer += str
-        elif '(' == str:
-            opStack.push(str)
-        elif ')' == str:
+    opStack = ArrayStack()
+    postfixList = []
+
+    for val in tokenList:
+        if type(val) == int:
+            postfixList.append(val)
+        elif val == '(':
+            opStack.push(val)
+        elif val == ')':
             pop = opStack.pop()
 
             while pop != '(':
-                answer += pop
+                postfixList.append(pop)
                 pop = opStack.pop()
 
-        elif str in prec:
+        elif val in prec:
             try:
                 peek = opStack.peek()
                 operator = prec[peek]
-                curr = prec[str]
+                curr = prec[val]
 
                 while operator >= curr:
-                    answer += opStack.pop()
+                    postfixList.append(opStack.pop())
 
-                opStack.push(str)
+                opStack.push(val)
             except IndexError:
-                opStack.push(str)
+                opStack.push(val)
 
     while not opStack.isEmpty():
-        answer += opStack.pop()
+        postfixList.append(opStack.pop())
 
-    return answer
+    return postfixList
 
 
 # 후위 표기 수식 계산
@@ -149,24 +180,35 @@ def solution(S):  # (A+B)*(C+D)
 '''
 
 
-def splitTokens(exprStr):
-    tokens = []
-    val = 0
-    valProcessing = False
-    for c in exprStr:
-        if c == ' ':
-            continue
-        if c in '0123456789':
-            val = val * 10 + int(c)
-            valProcessing = True
-        else:
-            if valProcessing:
-                tokens.append(val)
-                val = 0
-            valProcessing = False
-            tokens.append(c)
+def postfixEval(tokenList):
+    valStack = ArrayStack()
 
-    if valProcessing:
-        tokens.append(val)
+    for token in tokenList:
+        if type(token) is int:
+            valStack.push(token)
 
-    return tokens
+        elif token == '*':
+            pop1, pop2 = valStack.pop(), valStack.pop()
+            mul = pop2 * pop1
+            valStack.push(mul)
+        elif token == '/':
+            pop1, pop2 = valStack.pop(), valStack.pop()
+            div = pop2 / pop1
+            valStack.push(div)
+        elif token == '+':
+            pop1, pop2 = valStack.pop(), valStack.pop()
+            plus = pop2 + pop1
+            valStack.push(plus)
+        elif token == '-':
+            pop1, pop2 = valStack.pop(), valStack.pop()
+            minos = pop2 - pop1
+            valStack.push(minos)
+
+    return valStack.pop()
+
+
+expr = '(123+12)*(92+56)'
+tokens = splitTokens(expr)
+postfix = infixToPostfix(tokens)
+val = postfixEval(postfix)
+print(val)
