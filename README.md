@@ -1,5 +1,7 @@
 # The-Sandbox UX 기능 리스트
 
+1) 
+
 ## 공통
 
 - Tab 키 또는 Play 버튼 : 게임 모드 전환
